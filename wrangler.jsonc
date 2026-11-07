@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "agentic-token-data-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "X402_NETWORK": "eip155:8453",
+    "X402_FACILITATOR_URL": "https://facilitator.payai.network",
+    "X402_PRICE_USD": "0.003",
+    "X402_PAY_TO": "0x78063D20FafD3B24A498192B5484C48A38811fA2"
+  }
+}
+
