@@ -1,0 +1,10 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Agentic Data API",
+  "name_for_model": "agentic_data_api",
+  "description_for_human": "Paid compact news, scholarly, Wikidata and crypto market data for agents.",
+  "description_for_model": "OpenAPI lists paid endpoints for GDELT news metadata (/v1/news/search), OpenAlex and Crossref scholarly metadata (/v1/research/search), Wikidata entity search (/v1/entities/search), and CoinSpectrum token data (/v1/token). Metadata only: no article text, research abstracts, or full text. Preserve source licenses and response attribution. Payment uses x402 v2 exact USDC on Base mainnet: read PAYMENT-REQUIRED from HTTP 402, create a compatible payment payload, retry with PAYMENT-SIGNATURE, and parse JSON. The live challenge is authoritative for price, recipient, asset and network.",
+  "auth": { "type": "none" },
+  "api": { "type": "openapi", "url": "https://agentic-token-data-api.edirinacio1996.workers.dev/openapi.yaml", "is_user_authenticated": false }
+}
+
