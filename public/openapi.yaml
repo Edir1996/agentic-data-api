@@ -1,0 +1,76 @@
+openapi: 3.1.0
+info:
+  title: Agentic Data API
+  version: 3.0.0
+  description: >-
+    Compact, paid data endpoints for autonomous agents. Each paid endpoint uses
+    x402 exact USDC on Base. On HTTP 402, read PAYMENT-REQUIRED and retry with
+    PAYMENT-SIGNATURE. The live payment challenge is authoritative for price,
+    recipient, asset and network.
+servers:
+  - url: https://agentic-token-data-api.edirinacio1996.workers.dev
+paths:
+  /v1/token:
+    get:
+      operationId: getTokenSnapshot
+      summary: Retrieve CoinSpectrum token market data
+      description: Provide exactly one slug or symbol. Symbol matches can be ambiguous.
+      x-x402: { scheme: exact, network: eip155:8453, asset: USDC on Base, price: "USD 0.003 per call; use PAYMENT-REQUIRED as source of truth" }
+      parameters:
+        - { name: slug, in: query, required: false, schema: { type: string }, example: bitcoin }
+        - { name: symbol, in: query, required: false, schema: { type: string }, example: BTC }
+      responses:
+        '200': { description: Structured asset and live market snapshot with CC BY 4.0 attribution. }
+        '400': { description: Invalid query; no payment requested. }
+        '402': { description: x402 payment required. }
+        '404': { description: Asset or symbol not found. }
+  /v1/news/search:
+    get:
+      operationId: searchNews
+      summary: Search recent global news metadata
+      description: Uses GDELT DOC 2.0; returns title, publisher domain, date, language, country and source URL, not article text.
+      x-x402: { scheme: exact, network: eip155:8453, asset: USDC on Base, price: "USD 0.003 per call; use PAYMENT-REQUIRED as source of truth" }
+      parameters:
+        - { name: q, in: query, required: true, description: GDELT query expression, schema: { type: string, minLength: 2, maxLength: 200 }, example: climate policy }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 10, default: 5 } }
+      responses:
+        '200': { description: Compact GDELT article metadata with source terms and attribution. }
+        '400': { description: Invalid query; no payment requested. }
+        '402': { description: x402 payment required. }
+        '502': { description: GDELT unavailable. }
+  /v1/research/search:
+    get:
+      operationId: searchResearch
+      summary: Search scholarly metadata
+      description: Queries OpenAlex and Crossref in parallel. Returns bibliographic metadata only; abstracts and full text are omitted.
+      x-x402: { scheme: exact, network: eip155:8453, asset: USDC on Base, price: "USD 0.003 per call; use PAYMENT-REQUIRED as source of truth" }
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string, minLength: 2, maxLength: 200 }, example: large language models }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 10, default: 5 } }
+      responses:
+        '200': { description: Separate OpenAlex and Crossref results, license and provider status. Either source may be unavailable. }
+        '400': { description: Invalid query; no payment requested. }
+        '402': { description: x402 payment required. }
+        '502': { description: Both scholarly metadata providers unavailable. }
+  /v1/entities/search:
+    get:
+      operationId: searchWikidataEntities
+      summary: Search Wikidata entities
+      description: Returns entity identifiers, labels, descriptions and canonical URLs; Wikidata structured data is CC0.
+      x-x402: { scheme: exact, network: eip155:8453, asset: USDC on Base, price: "USD 0.003 per call; use PAYMENT-REQUIRED as source of truth" }
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string, minLength: 2, maxLength: 200 }, example: Marie Curie }
+        - { name: language, in: query, required: false, schema: { type: string, pattern: '^[a-z]{2,3}$', default: en } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 10, default: 5 } }
+      responses:
+        '200': { description: Wikidata entity candidates with CC0 license and attribution. }
+        '400': { description: Invalid query; no payment requested. }
+        '402': { description: x402 payment required. }
+        '502': { description: Wikidata unavailable. }
+  /healthz:
+    get:
+      operationId: health
+      summary: Check service status
+      responses:
+        '200': { description: Service health and payment network. }
+
