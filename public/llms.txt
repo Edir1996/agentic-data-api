@@ -1,0 +1,38 @@
+# Agentic Data API
+
+Paid, compact data endpoints for autonomous agents. Base URL:
+https://agentic-token-data-api.edirinacio1996.workers.dev
+
+## Discovery
+- OpenAPI 3.1: /openapi.yaml
+- x402 Bazaar discovery declarations are included in HTTP payment challenges.
+- Each call costs the live price advertised in PAYMENT-REQUIRED (currently USD 0.003 USDC on Base mainnet, eip155:8453).
+
+## x402 protocol
+1. Request an endpoint normally.
+2. On HTTP 402, parse PAYMENT-REQUIRED (the legacy X-402-Payment-Required header is also mirrored).
+3. Create/sign the exact payment using an x402-compatible client and the challenge fields.
+4. Retry the identical URL with PAYMENT-SIGNATURE (legacy x-402-payment-proof is accepted).
+5. On HTTP 200, parse the compact JSON. Do not hard-code the recipient or price; use the live challenge.
+
+## Endpoints
+- GET /v1/token?slug=bitcoin — CoinSpectrum asset snapshot and ticker metrics.
+- GET /v1/token?symbol=BTC — live ticker metrics; ticker may be ambiguous.
+- GET /v1/news/search?q=climate%20policy&limit=5 — GDELT recent article metadata and links. No article text.
+- GET /v1/research/search?q=large%20language%20models&limit=5 — OpenAlex plus Crossref bibliographic search. Abstracts/full text omitted.
+- GET /v1/entities/search?q=Marie%20Curie&language=en&limit=5 — Wikidata entity search.
+- GET /healthz — free health check.
+
+Search endpoints require q (2–200 chars); limit is 1–10 (default 5). Wikidata language defaults to en.
+Invalid query parameters return JSON HTTP 400 before payment is requested. Provider failures use JSON error codes and retry guidance. Research results can be partial if one scholarly provider is unavailable.
+
+## Data reuse
+- CoinSpectrum: CC BY 4.0; preserve response attribution.
+- GDELT: free commercial reuse under project terms with attribution; response includes metadata/links only.
+- OpenAlex: CC0.
+- Crossref: bibliographic facts are generally not copyrightable; Crossref-generated data is CC0. Abstracts may be copyrighted and are not included.
+- Wikidata structured data: CC0; credit is appreciated.
+
+## Payment agent behavior
+Use an x402 v2 client supporting exact EVM payments on Base and the Bazaar discovery extension. Treat HTTP 402 as a payment challenge, not as a failed data query. Retry with bounded exponential backoff only for 429/502/503 errors. A 402 challenge alone is not a completed payment.
+
