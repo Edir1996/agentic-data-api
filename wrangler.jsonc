@@ -14,7 +14,6 @@
     "X402_NETWORK": "eip155:8453",
     "X402_FACILITATOR_URL": "https://facilitator.payai.network",
     "X402_PRICE_USD": "0.003",
-    "X402_PAY_TO": "0x78063D20FafD3B24A498192B5484C48A38811fA2"
+    "X402_PAY_TO": "0xae2df9a9115052194c62cf9d0570e4aa1d9da4c3"
   }
 }
-
