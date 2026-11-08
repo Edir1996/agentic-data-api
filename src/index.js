@@ -751,8 +751,23 @@ export default {
     }
 
     const responseHeaders = new Headers(response.headers);
+    responseHeaders.set('X-Payment-Required', required);
     responseHeaders.set('X-402-Payment-Required', required);
-    return new Response(response.body, {
+    let responseBody = await response.clone().text();
+    try {
+      const binary = atob(required);
+      const challengeBytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      const challenge = JSON.parse(new TextDecoder().decode(challengeBytes));
+      const body = JSON.parse(responseBody);
+      if (body && typeof body === 'object' && !Array.isArray(body)) {
+        responseBody = JSON.stringify({ ...body, ...challenge });
+        responseHeaders.set('content-type', 'application/json; charset=utf-8');
+        responseHeaders.delete('content-length');
+      }
+    } catch {
+      // Keep the facilitator's challenge header authoritative if its body cannot be mirrored.
+    }
+    return new Response(responseBody, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders,
